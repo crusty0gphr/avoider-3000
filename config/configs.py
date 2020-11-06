@@ -1,13 +1,18 @@
-import re
+import re, pygame
 
 game_started = False
 
+pygame.init()
+display_info = pygame.display.Info()
+screen_size_calculated = (display_info.current_w, display_info.current_h)
+screen_size = screen_size_calculated
+
 game_name = 'Avoider-3000'
-screen_size = (1280, 768)
 laser_shot_count = 0
-powerup_count = 50
-ammo_count = 25
-laser_timer = 0
+powerup_count = 90
+ammo_count = 35
+game_timer = 0
+
 laser_ready = False
 
 spaceship_assets_path = 'assets/spaceship/'

@@ -19,7 +19,7 @@ class SpaceShip(pygame.sprite.Sprite):
 		self.shield_surface = pygame.image.load('assets/hot-dog-heart.png')
 
 		self.health = 5
-		self.ammo = 20
+		self.ammo = 30
 
 	def update(self):
 		self.image_index += 1
@@ -62,7 +62,7 @@ class SpaceShip(pygame.sprite.Sprite):
 		self.health = 5
 
 	def restore_ammo(self):
-		self.ammo = 20
+		self.ammo = 30
 
 	def screen_constrain(self):
 		if self.rect.left <= 0: self.rect.left = 0
