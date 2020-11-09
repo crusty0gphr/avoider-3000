@@ -1,5 +1,5 @@
 import pygame, glob
-from config.configs import spaceship_assets_path, natural_sort, screen_size
+from config.configs import spaceship_assets_path, natural_sort, screen_size, resource_path
 
 class SpaceShip(pygame.sprite.Sprite):
 	def __init__(self, x_pos, y_pos, screen_obj):
@@ -11,12 +11,12 @@ class SpaceShip(pygame.sprite.Sprite):
 		self.images = natural_sort(glob.glob(spaceship_assets_path + '*.gif'))
 
 		self.image_index = 0
-		self.image = pygame.image.load(self.images[self.image_index])
+		self.image = pygame.image.load(resource_path(self.images[self.image_index]))
 		self.clean_image = self.image.copy()
 		self.center = (x_pos, y_pos)
 
 		self.rect = self.image.get_rect(center = self.center)
-		self.shield_surface = pygame.image.load('assets/hot-dog-heart.png')
+		self.shield_surface = pygame.image.load(resource_path('assets/hot-dog-heart.png'))
 
 		self.health = 5
 		self.ammo = 30
@@ -35,7 +35,7 @@ class SpaceShip(pygame.sprite.Sprite):
 		if self.image_index >= len(self.images):
 			self.image_index = 0
 
-		self.image = pygame.image.load(self.images[self.image_index])
+		self.image = pygame.image.load(resource_path(self.images[self.image_index]))
 		self.clean_image = self.image.copy()
 
 	def display_health(self):
@@ -44,7 +44,7 @@ class SpaceShip(pygame.sprite.Sprite):
 			self.screen.blit(self.shield_surface, (index * 25, screen_size[1] - 40))
 
 	def display_ammo(self):
-		score_font = pygame.font.Font('assets/fonts/retro-gaming.ttf', 18)
+		score_font = pygame.font.Font(resource_path('assets/fonts/retro-gaming.ttf'), 18)
 		# text_surface_center = (730, 577)
 		text_surface_center = (screen_size[0] - 70, screen_size[1] - 23)
 		text_surface = score_font.render('AMMO: ' + str(self.ammo), False, (255, 255, 255))

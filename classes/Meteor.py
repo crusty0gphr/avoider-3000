@@ -1,5 +1,5 @@
 import pygame, glob
-from config.configs import meteor_assets_path, natural_sort, screen_size
+from config.configs import meteor_assets_path, natural_sort, screen_size, resource_path
 
 class Meteor(pygame.sprite.Sprite):
 	def __init__(self, path, x_pos, y_pos, x_speed, y_speed, rotation_speed):
@@ -10,7 +10,7 @@ class Meteor(pygame.sprite.Sprite):
 		self.images = natural_sort(glob.glob(self.metheor_collection_path + '*.gif'))
 
 		self.image_index = 0
-		self.image = pygame.image.load(self.images[self.image_index])
+		self.image = pygame.image.load(resource_path(self.images[self.image_index]))
 		self.clean_image = self.image.copy()
 
 		# movement dimentions
@@ -38,7 +38,7 @@ class Meteor(pygame.sprite.Sprite):
 		if self.image_index >= len(self.images):
 			self.image_index = 0
 
-		self.image = pygame.image.load(self.images[self.image_index])
+		self.image = pygame.image.load(resource_path(self.images[self.image_index]))
 		self.clean_image = self.image.copy()
 
 	def rotate_meteors(self):
