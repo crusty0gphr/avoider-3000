@@ -1,4 +1,4 @@
-import pygame, sys, random
+import pygame, sys, random, glob
 
 from config.configs import *
 from classes.SpaceShip import SpaceShip
@@ -10,7 +10,11 @@ from classes.Powerup import Powerup
 
 pygame.init()
 pygame.display.set_caption(game_name)
-screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN)
+if debug_mode:
+	screen = pygame.display.set_mode((1280, 720))
+else:
+	screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN)
+
 clock = pygame.time.Clock()
 
 # sprites groups
@@ -37,7 +41,7 @@ def game_menu():
 	render_msg('-= AVOIDER =-', 100, (screen_size[0]/2, 100))
 	render_msg('3000', 72, (screen_size[0]/2, 200))
 
-	hot_dog = pygame.image.load('assets/powerups/hot-dog.png')
+	hot_dog = pygame.image.load(resource_path('assets/powerups/hot-dog.png'))
 	screen.blit(hot_dog, (screen_size[0]/2 - 30, screen_size[1]/2 - 60))
 	render_msg('Press SPACE to start!', 32, (screen_size[0]/2, screen_size[1]/2 + 100))
 	render_msg('Press Q to quit!', 22, (screen_size[0]/2, screen_size[1]/2 + 140))
@@ -113,7 +117,7 @@ def init_game_over():
 	render_msg('Press Q to quit the game', 22, (screen_size[0]/2, screen_size[1]/2 + 160))
 
 def render_msg(msg, font_size, text_pos):
-	font = pygame.font.Font('assets/fonts/retro-gaming.ttf', font_size)
+	font = pygame.font.Font(resource_path('assets/fonts/retro-gaming.ttf'), font_size)
 
 	text_surface_center = text_pos
 	text_surface = font.render(msg, False, (255, 255, 255))
