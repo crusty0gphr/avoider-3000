@@ -42,7 +42,7 @@ def game_menu():
 	render_msg('Press SPACE to start!', 32, (screen_size[0]/2, screen_size[1]/2 + 100))
 	render_msg('Press Q to quit!', 22, (screen_size[0]/2, screen_size[1]/2 + 140))
 
-	render_msg('- Designed by: Sargis Mardirossian - Developer: Harout Mardirossian -', 18, (screen_size[0]/2, screen_size[1] - 70))
+	render_msg('- Designed by: Sargis Mardirossian - Developed by: Harutyun Mardirossian -', 18, (screen_size[0]/2, screen_size[1] - 70))
 	render_msg('from @Corrupted.bit', 20, (screen_size[0]/2, screen_size[1] - 40))
 
 def init_powerups(powerup_path, powerup_group):
