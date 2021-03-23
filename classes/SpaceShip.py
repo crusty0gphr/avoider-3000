@@ -1,3 +1,7 @@
+"""
+	Class: Score
+	Info: update, reset, show users' score on the screen
+"""
 import glob
 import pygame
 
@@ -18,7 +22,7 @@ class SpaceShip(pygame.sprite.Sprite):
 		self.clean_image = self.image.copy()
 		self.center = (x_pos, y_pos)
 
-		self.rect = self.image.get_rect(center = self.center)
+		self.rect = self.image.get_rect(center=self.center)
 		self.shield_surface = pygame.image.load('assets/hot-dog-heart.png')
 
 		self.health = 5
@@ -51,13 +55,15 @@ class SpaceShip(pygame.sprite.Sprite):
 		# text_surface_center = (730, 577)
 		text_surface_center = (screen_size[0] - 70, screen_size[1] - 23)
 		text_surface = score_font.render('AMMO: ' + str(self.ammo), False, (255, 255, 255))
-		text_rect = text_surface.get_rect(center = text_surface_center)
+		text_rect = text_surface.get_rect(center=text_surface_center)
 
 		self.screen.blit(text_surface, text_rect)
 
+	# decrease players health when hits an obstacle
 	def get_damage(self, damage_amount):
 		self.health -= damage_amount
 
+	# decrease ammo when player shoots
 	def decrease_ammo(self, shot_amount):
 		self.ammo -= shot_amount
 
@@ -73,19 +79,23 @@ class SpaceShip(pygame.sprite.Sprite):
 		if self.rect.top <= 0: self.rect.top = 0
 		if self.rect.bottom >= screen_size[1] - 50: self.rect.bottom = screen_size[1] - 50
 
+	# spaceship animation when the player moves the mouse
 	def rotate(self):
 		mouse_rel = pygame.mouse.get_rel()
 
+		# mouse movement - left
 		if mouse_rel[0] < 0:
-			self.image = self.rot_center(self.clean_image, 15)
+			self.image = self.rot_center(self.clean_image, 15)  # tilt the spaceship 15 degrees left
 			return
 
+		# mouse movement - right
 		if mouse_rel[0] > 0:
-			self.image = self.rot_center(self.clean_image, -15)
+			self.image = self.rot_center(self.clean_image, -15)  # tilt the spaceship 15 degrees right
 			return
 
+		# mouse movement - stopped
 		if mouse_rel[0] == 0:
-			self.image = self.rot_center(self.clean_image, 0)
+			self.image = self.rot_center(self.clean_image, 0)  # reset
 			return
 
 	def rot_center(self, image, angle):

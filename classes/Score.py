@@ -1,8 +1,12 @@
+"""
+	Class: Score
+	Info: update, reset, show users' score on the screen
+"""
 import pygame
 from config.configs import screen_size
 
 
-class Score():
+class Score:
 	def __init__(self, screen):
 		self.score = 0
 		self.screen = screen

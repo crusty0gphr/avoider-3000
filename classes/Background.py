@@ -1,3 +1,8 @@
+"""
+	Class: Background
+	Info: made for drawing moving non-collide objects on the background (example: moving stars)
+"""
+
 import pygame
 from config.configs import screen_size
 
@@ -14,6 +19,7 @@ class Background(pygame.sprite.Sprite):
 
 		self.rect = self.image.get_rect(center = (x_pos, y_pos))
 
+	# update positions of the background objects frame by frame
 	def update(self):
 		self.rect.centerx += self.x_speed
 		self.rect.centery += self.y_speed

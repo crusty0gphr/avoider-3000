@@ -1,3 +1,8 @@
+"""
+	Class: Laser
+	Info: logic for the laser sprite
+"""
+
 import pygame
 
 
