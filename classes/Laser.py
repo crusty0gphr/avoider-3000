@@ -1,5 +1,6 @@
 import pygame
 
+
 class Laser(pygame.sprite.Sprite):
 	def __init__(self, path, pos, speed):
 		super().__init__()

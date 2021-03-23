@@ -1,13 +1,14 @@
 import pygame
 from config.configs import screen_size
 
+
 class Background(pygame.sprite.Sprite):
 	def __init__(self, path, x_pos, y_pos, x_speed, y_speed):
 		super().__init__()
 		self.image = pygame.image.load(path)
 		self.clean_image = self.image.copy()
 
-		# movement dimentions
+		# movement dimensions
 		self.x_speed = x_speed
 		self.y_speed = y_speed
 

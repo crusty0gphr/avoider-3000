@@ -1,5 +1,8 @@
-import pygame, glob
+import glob
+import pygame
+
 from config.configs import meteor_assets_path, natural_sort, screen_size
+
 
 class Meteor(pygame.sprite.Sprite):
 	def __init__(self, path, x_pos, y_pos, x_speed, y_speed, rotation_speed):
@@ -13,7 +16,7 @@ class Meteor(pygame.sprite.Sprite):
 		self.image = pygame.image.load(self.images[self.image_index])
 		self.clean_image = self.image.copy()
 
-		# movement dimentions
+		# movement dimensions
 		self.x_speed = x_speed
 		self.y_speed = y_speed
 

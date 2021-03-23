@@ -1,12 +1,13 @@
-import pygame, sys, random
+import random
+import sys
 
-from config.configs import *
-from classes.SpaceShip import SpaceShip
-from classes.Meteor import Meteor
 from classes.Background import Background
 from classes.Laser import Laser
+from classes.Meteor import Meteor
+from classes.PowerUp import PowerUp
 from classes.Score import Score
-from classes.Powerup import Powerup
+from classes.SpaceShip import SpaceShip
+from config.configs import *
 
 pygame.init()
 pygame.display.set_caption(game_name)
@@ -22,7 +23,7 @@ star_group = pygame.sprite.Group()
 healing_group = pygame.sprite.Group()
 ammo_group = pygame.sprite.Group()
 
-# continius timer
+# continuous timer
 METEOR_EVENT = pygame.USEREVENT
 pygame.time.set_timer(METEOR_EVENT, 250)
 
@@ -31,6 +32,7 @@ SpaceShip = SpaceShip(400, 500, screen)
 spaceship_group.add(SpaceShip)
 # score obj
 Score = Score(screen)
+
 
 def game_menu():
 	global screen
@@ -45,17 +47,20 @@ def game_menu():
 	render_msg('- Designed by: Sargis Mardirossian - Developed by: Harutyun Mardirossian -', 18, (screen_size[0]/2, screen_size[1] - 70))
 	render_msg('from @Corrupted.bit', 20, (screen_size[0]/2, screen_size[1] - 40))
 
-def init_powerups(powerup_path, powerup_group):
+
+def init_power_ups(power_up_path, power_up_group):
 	random_x_pos = random.randrange(50, screen_size[0] - 50)
 	random_y_pos = random.randrange(-200, -50)
 
-	powerup = Powerup(powerup_path, random_x_pos, random_y_pos)
-	powerup_group.add(powerup)
+	powerup = PowerUp(power_up_path, random_x_pos, random_y_pos)
+	power_up_group.add(powerup)
+
 
 def init_background():
 	# draw stars
 	star_group.draw(screen)
 	star_group.update()
+
 
 def init_game_pross(score_obj):
 	# hide the mouse cursor
@@ -102,6 +107,7 @@ def init_game_pross(score_obj):
 	if pygame.time.get_ticks() - game_timer >= 125:
 		laser_ready = True
 
+
 def init_game_over():
 	# hide the mouse cursor
 	pygame.mouse.set_visible(True)
@@ -112,6 +118,7 @@ def init_game_over():
 	render_msg('Press SPACE to continue!', 32, (screen_size[0]/2, screen_size[1]/2 + 100))
 	render_msg('Press Q to quit the game', 22, (screen_size[0]/2, screen_size[1]/2 + 160))
 
+
 def render_msg(msg, font_size, text_pos):
 	font = pygame.font.Font('assets/fonts/retro-gaming.ttf', font_size)
 
@@ -120,6 +127,7 @@ def render_msg(msg, font_size, text_pos):
 	text_rect = text_surface.get_rect(center = text_surface_center)
 	screen.blit(text_surface, text_rect)
 
+
 def reset_game():
 	spaceship_group.sprite.health = 5
 	meteor_group.empty()
@@ -127,6 +135,7 @@ def reset_game():
 	Score.reset()
 	spaceship_group.sprite.restore_ammo()
 	spaceship_group.sprite.restore_health()
+
 
 while True:
 	for event in pygame.event.get():
@@ -170,12 +179,12 @@ while True:
 				''' ------------------ Add random PowerUp into the group ------------------ '''
 
 				if powerup_count == 0:
-					init_powerups(hot_god_powerup_path, healing_group)
+					init_power_ups(hot_god_powerup_path, healing_group)
 				elif powerup_count < 0:
 					powerup_count = 90
 
 				if ammo_count == 0:
-					init_powerups(ammo_powerup_path, ammo_group)
+					init_power_ups(ammo_powerup_path, ammo_group)
 				elif ammo_count < 0:
 					ammo_count = 35
 

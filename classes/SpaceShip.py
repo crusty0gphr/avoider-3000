@@ -1,5 +1,8 @@
-import pygame, glob
+import glob
+import pygame
+
 from config.configs import spaceship_assets_path, natural_sort, screen_size
+
 
 class SpaceShip(pygame.sprite.Sprite):
 	def __init__(self, x_pos, y_pos, screen_obj):

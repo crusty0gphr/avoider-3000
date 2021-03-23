@@ -1,6 +1,7 @@
 import pygame
 from config.configs import screen_size
 
+
 class Score():
 	def __init__(self, screen):
 		self.score = 0
