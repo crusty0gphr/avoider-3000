@@ -7,9 +7,9 @@ I really love old games and always enjoyed playing them over and over. So I thou
 Looking through the pages of the book, we came across "Space Invaders". The iconic game of the time and a space shoot-em-up. I started recreating that game but during the development, I changed my mind.
 "Space Invaders" is a static game and doesn't have much action happening, you don't have many obstacles to avoid. **Avoid. AVOID? AVOIDER made to avoid. That's it!**
 
-## Game writen using Python using PyGame Module
+## Game writen using Python using **PyGame** Module
 
-### Developer demependencies
+### Developer dependencies
 
 install pygame:
 ```
@@ -21,6 +21,8 @@ in terminal:
 ```
 ~ python main.py
 ```
+
+Game developed using **Python 3.7.2** and tested on **Python 3.9**
 
 ## Screenshots
 
