@@ -31,6 +31,6 @@ Game developed using **Python 3.7.2** and tested on **Python 3.9**
 
 ### Gameplay Screen
 ![avoider-3000-main-menu](./game-screen-2.png)
-
+#
 ### The game is still in development. 
 I'm adding new things to it (not always, I'm too lazy to do it), doing the code clean up, and improving functionality, and I guess I will release it someday, but for now I still working on an idea of implementing cool mechanics into the game, because it is still a boring piece of code.
