@@ -1,6 +1,9 @@
+import os
+
 import pygame
 import re
 
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 game_started = False
 
 pygame.init()
@@ -16,12 +19,12 @@ game_timer = 0
 
 laser_ready = False
 
-spaceship_assets_path = 'src/assets/spaceship/'
-meteor_assets_path = 'src/assets/meteors/'
-star_asset_path = 'src/assets/star.png'
-laser_path = 'src/assets/laser.png'
-hot_god_powerup_path = 'src/assets/powerups/hot-dog.png'
-ammo_powerup_path = 'src/assets/powerups/nuclear-buletons.png'
+spaceship_assets_path = ROOT_DIR + '/assets/spaceship/'
+meteor_assets_path = ROOT_DIR + '/assets/meteors/'
+star_asset_path = ROOT_DIR + '/assets/star.png'
+laser_path = ROOT_DIR + '/assets/laser.png'
+hot_god_powerup_path = ROOT_DIR + '/assets/powerups/hot-dog.png'
+ammo_powerup_path = ROOT_DIR + '/assets/powerups/nuclear-buletons.png'
 
 meteor_assets_tuple = ('asteroid/', 'planetoid/', 'space-door/', 'comet/')
 

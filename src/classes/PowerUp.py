@@ -3,7 +3,7 @@
 	Info: for object that the player can interrupt with (ammo, health, mutators)
 """
 import pygame
-from src.config.configs import screen_size
+from configs import screen_size
 
 
 class PowerUp(pygame.sprite.Sprite):

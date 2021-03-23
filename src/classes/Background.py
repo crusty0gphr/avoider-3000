@@ -4,7 +4,7 @@
 """
 
 import pygame
-from src.config.configs import screen_size
+from configs import screen_size
 
 
 class Background(pygame.sprite.Sprite):
@@ -17,7 +17,7 @@ class Background(pygame.sprite.Sprite):
 		self.x_speed = x_speed
 		self.y_speed = y_speed
 
-		self.rect = self.image.get_rect(center = (x_pos, y_pos))
+		self.rect = self.image.get_rect(center=(x_pos, y_pos))
 
 	# update positions of the background objects frame by frame
 	def update(self):

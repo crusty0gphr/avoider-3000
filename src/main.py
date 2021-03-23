@@ -1,3 +1,4 @@
+import os
 import random
 import sys
 
@@ -7,7 +8,7 @@ from classes.Meteor import Meteor
 from classes.PowerUp import PowerUp
 from classes.Score import Score
 from classes.SpaceShip import SpaceShip
-from config.configs import *
+from configs import *
 
 pygame.init()
 pygame.display.set_caption(game_name)
@@ -36,21 +37,22 @@ Score = Score(screen)
 
 def game_menu():
 	global screen
-	render_msg('-= AVOIDER =-', 100, (screen_size[0]/2, 100))
-	render_msg('3000', 72, (screen_size[0]/2, 200))
+	render_msg('-= AVOIDER =-', 100, (screen_size[0] / 2, 100))
+	render_msg('3000', 72, (screen_size[0] / 2, 200))
 
-	hot_dog = pygame.image.load('src/assets/powerups/hot-dog.png')
-	screen.blit(hot_dog, (screen_size[0]/2 - 30, screen_size[1]/2 - 60))
-	render_msg('Press SPACE to start!', 32, (screen_size[0]/2, screen_size[1]/2 + 100))
-	render_msg('Press Q to quit!', 22, (screen_size[0]/2, screen_size[1]/2 + 140))
+	hot_dog = pygame.image.load(ROOT_DIR + '/assets/powerups/hot-dog.png')
+	screen.blit(hot_dog, (screen_size[0] / 2 - 30, screen_size[1] / 2 - 60))
+	render_msg('Press SPACE to start!', 32, (screen_size[0] / 2, screen_size[1] / 2 + 100))
+	render_msg('Press Q to quit!', 22, (screen_size[0] / 2, screen_size[1] / 2 + 140))
 
-	render_msg('- Designed by: Sargis Mardirossian - Developed by: Harutyun Mardirossian -', 18, (screen_size[0]/2, screen_size[1] - 70))
-	render_msg('from @Corrupted.bit', 20, (screen_size[0]/2, screen_size[1] - 40))
+	render_msg('- Designed by: Sargis Mardirossian - Developed by: Harutyun Mardirossian -', 18,
+				(screen_size[0] / 2, screen_size[1] - 70))
+	render_msg('from @Corrupted.bit', 20, (screen_size[0] / 2, screen_size[1] - 40))
 
 
 def init_power_ups(power_up_path, power_up_group):
 	random_x_pos = random.randrange(50, screen_size[0] - 50)
-	random_y_pos = random.randrange(-200, -50)
+	random_y_pos = random_x_pos.randrange(-200, -50)
 
 	powerup = PowerUp(power_up_path, random_x_pos, random_y_pos)
 	power_up_group.add(powerup)
@@ -113,18 +115,18 @@ def init_game_over():
 	pygame.mouse.set_visible(True)
 	score = Score.get_score()
 
-	render_msg('GAME OVER', 58, (screen_size[0]/2, screen_size[1]/2 - 100))
-	render_msg(str(score), 48, (screen_size[0]/2, screen_size[1]/2 - 40))
-	render_msg('Press SPACE to continue!', 32, (screen_size[0]/2, screen_size[1]/2 + 100))
-	render_msg('Press Q to quit the game', 22, (screen_size[0]/2, screen_size[1]/2 + 160))
+	render_msg('GAME OVER', 58, (screen_size[0] / 2, screen_size[1] / 2 - 100))
+	render_msg(str(score), 48, (screen_size[0] / 2, screen_size[1] / 2 - 40))
+	render_msg('Press SPACE to continue!', 32, (screen_size[0] / 2, screen_size[1] / 2 + 100))
+	render_msg('Press Q to quit the game', 22, (screen_size[0] / 2, screen_size[1] / 2 + 160))
 
 
 def render_msg(msg, font_size, text_pos):
-	font = pygame.font.Font('src/assets/fonts/retro-gaming.ttf', font_size)
+	font = pygame.font.Font(ROOT_DIR + '/assets/fonts/retro-gaming.ttf', font_size)
 
 	text_surface_center = text_pos
 	text_surface = font.render(msg, False, (255, 255, 255))
-	text_rect = text_surface.get_rect(center = text_surface_center)
+	text_rect = text_surface.get_rect(center=text_surface_center)
 	screen.blit(text_surface, text_rect)
 
 

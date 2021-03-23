@@ -5,7 +5,7 @@
 import glob
 import pygame
 
-from src.config.configs import meteor_assets_path, natural_sort, screen_size
+from configs import meteor_assets_path, natural_sort, screen_size
 
 
 class Meteor(pygame.sprite.Sprite):
