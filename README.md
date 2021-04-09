@@ -15,7 +15,6 @@ Looking through the pages of the book, we came across "Space Invaders". The icon
 in terminal:
 ```
 ~ pip install -r requirements.txt
-~ export PYTHONPATH="[game directory on your machine]"
 ~ python main.py
 ```
 

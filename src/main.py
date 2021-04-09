@@ -52,7 +52,7 @@ def game_menu():
 
 def init_power_ups(power_up_path, power_up_group):
 	random_x_pos = random.randrange(50, screen_size[0] - 50)
-	random_y_pos = random_x_pos.randrange(-200, -50)
+	random_y_pos = random.randrange(-200, -50)
 
 	powerup = PowerUp(power_up_path, random_x_pos, random_y_pos)
 	power_up_group.add(powerup)
