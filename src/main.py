@@ -1,13 +1,12 @@
-import os
 import random
 import sys
 
-from classes.Background import Background
-from classes.Laser import Laser
-from classes.Meteor import Meteor
-from classes.PowerUp import PowerUp
-from classes.Score import Score
-from classes.SpaceShip import SpaceShip
+from classes.background import Background
+from classes.laser import Laser
+from classes.meteors import Meteor
+from classes.powerup import PowerUp
+from classes.scoreboard import Score
+from classes.spaceship import SpaceShip
 from configs import *
 
 pygame.init()
@@ -22,6 +21,7 @@ laser_group = pygame.sprite.Group()
 meteor_group = pygame.sprite.Group()
 star_group = pygame.sprite.Group()
 healing_group = pygame.sprite.Group()
+slow_down_group = pygame.sprite.Group()
 ammo_group = pygame.sprite.Group()
 
 # continuous timer
@@ -46,15 +46,15 @@ def game_menu():
 	render_msg('Press Q to quit!', 22, (screen_size[0] / 2, screen_size[1] / 2 + 140))
 
 	render_msg('- Designed by: Sargis Mardirossian - Developed by: Harutyun Mardirossian -', 18,
-				(screen_size[0] / 2, screen_size[1] - 70))
+			   (screen_size[0] / 2, screen_size[1] - 70))
 	render_msg('from @Corrupted.bit', 20, (screen_size[0] / 2, screen_size[1] - 40))
 
 
 def init_power_ups(power_up_path, power_up_group):
-	random_x_pos = random.randrange(50, screen_size[0] - 50)
-	random_y_pos = random.randrange(-200, -50)
+	random_x_pos_pu = random.randrange(50, screen_size[0] - 50)
+	random_y_pos_pu = random.randrange(-200, -50)
 
-	powerup = PowerUp(power_up_path, random_x_pos, random_y_pos)
+	powerup = PowerUp(power_up_path, random_x_pos_pu, random_y_pos_pu)
 	power_up_group.add(powerup)
 
 
@@ -82,13 +82,16 @@ def init_game_pross(score_obj):
 	# draw draw ammo
 	ammo_group.draw(screen)
 	ammo_group.update()
+	# draw slow down timer
+	slow_down_group.draw(screen)
+	slow_down_group.update()
 	# draw player
 	spaceship_group.draw(screen)
 	spaceship_group.update()
 	# game score
 	Score.draw()
 
-	''' --------- Check collisions --------- '''
+	''' --------- Check collisions with the SpaceShip --------- '''
 	if pygame.sprite.spritecollide(spaceship_group.sprite, meteor_group, True):
 		damage = random.randrange(1, 3)
 		spaceship_group.sprite.get_damage(damage)
@@ -99,6 +102,11 @@ def init_game_pross(score_obj):
 	if pygame.sprite.spritecollide(spaceship_group.sprite, ammo_group, True):
 		spaceship_group.sprite.restore_ammo()
 
+	if pygame.sprite.spritecollide(spaceship_group.sprite, slow_down_group, True):
+		for meteor in meteor_group.sprites():
+			if not meteor.slow_speed:
+				meteor.slow_down_movement_speed()
+
 	for laser in laser_group:
 		if pygame.sprite.spritecollide(laser, meteor_group, True):
 			laser_group.remove(laser)
@@ -108,6 +116,11 @@ def init_game_pross(score_obj):
 
 	if pygame.time.get_ticks() - game_timer >= 125:
 		laser_ready = True
+
+
+def play_sound_effect(effect_path):
+	soundObj = pygame.mixer.Sound(effect_path)
+	soundObj.play()
 
 
 def init_game_over():
@@ -158,6 +171,7 @@ while True:
 
 		if event.type == pygame.MOUSEBUTTONDOWN and spaceship_group.sprite.ammo > 0 and laser_ready:
 			''' ------------------ Shooting from laser ------------------ '''
+			play_sound_effect(laser_sound_effect)
 			laser = Laser(laser_path, pygame.mouse.get_pos(), 20)
 			spaceship_group.sprite.decrease_ammo(1)
 			laser_group.add(laser)
@@ -180,6 +194,11 @@ while True:
 
 				''' ------------------ Add random PowerUp into the group ------------------ '''
 
+				if slow_down_timer_count == 0:
+					init_power_ups(slow_down_timer, slow_down_group)
+				elif slow_down_timer_count < 0:
+					slow_down_timer_count = 120
+
 				if powerup_count == 0:
 					init_power_ups(hot_god_powerup_path, healing_group)
 				elif powerup_count < 0:
@@ -190,6 +209,7 @@ while True:
 				elif ammo_count < 0:
 					ammo_count = 35
 
+				slow_down_timer_count -= 1
 				powerup_count -= 1
 				ammo_count -= 1
 

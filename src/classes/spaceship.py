@@ -3,6 +3,7 @@
 	Info: update, reset, show users' score on the screen
 """
 import glob
+
 import pygame
 
 from configs import ROOT_DIR, spaceship_assets_path, natural_sort, screen_size
@@ -52,7 +53,6 @@ class SpaceShip(pygame.sprite.Sprite):
 
 	def display_ammo(self):
 		score_font = pygame.font.Font(ROOT_DIR + '/assets/fonts/retro-gaming.ttf', 18)
-		# text_surface_center = (730, 577)
 		text_surface_center = (screen_size[0] - 70, screen_size[1] - 23)
 		text_surface = score_font.render('AMMO: ' + str(self.ammo), False, (255, 255, 255))
 		text_rect = text_surface.get_rect(center=text_surface_center)
@@ -74,10 +74,17 @@ class SpaceShip(pygame.sprite.Sprite):
 		self.ammo = 30
 
 	def screen_constrain(self):
-		if self.rect.left <= 0: self.rect.left = 0
-		if self.rect.right >= screen_size[0]: self.rect.right = screen_size[0]
-		if self.rect.top <= 0: self.rect.top = 0
-		if self.rect.bottom >= screen_size[1] - 50: self.rect.bottom = screen_size[1] - 50
+		if self.rect.left <= 0:
+			self.rect.left = 0
+
+		if self.rect.right >= screen_size[0]:
+			self.rect.right = screen_size[0]
+
+		if self.rect.top <= 0:
+			self.rect.top = 0
+
+		if self.rect.bottom >= screen_size[1] - 50:
+			self.rect.bottom = screen_size[1] - 50
 
 	# spaceship animation when the player moves the mouse
 	def rotate(self):
@@ -85,20 +92,20 @@ class SpaceShip(pygame.sprite.Sprite):
 
 		# mouse movement - left
 		if mouse_rel[0] < 0:
-			self.image = self.rot_center(self.clean_image, 15)  # tilt the spaceship 15 degrees left
+			self.image = self.rotate_from_center(self.clean_image, 15)  # tilt the spaceship 15 degrees left
 			return
 
 		# mouse movement - right
 		if mouse_rel[0] > 0:
-			self.image = self.rot_center(self.clean_image, -15)  # tilt the spaceship 15 degrees right
+			self.image = self.rotate_from_center(self.clean_image, -15)  # tilt the spaceship 15 degrees right
 			return
 
 		# mouse movement - stopped
 		if mouse_rel[0] == 0:
-			self.image = self.rot_center(self.clean_image, 0)  # reset
+			self.image = self.rotate_from_center(self.clean_image, 0)  # reset
 			return
 
-	def rot_center(self, image, angle):
+	def rotate_from_center(self, image, angle):
 		orig_rect = image.get_rect()
 
 		rot_image = pygame.transform.rotate(image, angle)

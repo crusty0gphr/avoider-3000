@@ -3,6 +3,7 @@
 	Info: update, reset, show users' score on the screen
 """
 import pygame
+
 from configs import ROOT_DIR, screen_size
 
 
