@@ -32,10 +32,20 @@ slow_down_timer = ROOT_DIR + '/assets/powerups/slow-down-timer.gif'
 meteor_assets_tuple = ('asteroid/', 'planetoid/', 'space-door/', 'comet/')
 
 # assets = sounds
-laser_sound_effect = ROOT_DIR + '/assets/sounds/laser-shot.wav'
+laser_sound_effect = ROOT_DIR + '/assets/sounds/sound-effects/laser-shot.wav'
+metal_impact_sound_effect = ROOT_DIR + \
+    '/assets/sounds/sound-effects/metal-impact.wav'
+explosion_sound_effect = ROOT_DIR + '/assets/sounds/sound-effects/exlosion.wav'
+healing_sound_effect = ROOT_DIR + '/assets/sounds/sound-effects/healing.wav'
+laser_reload_sound_effect = ROOT_DIR + \
+    '/assets/sounds/sound-effects/laser-reload.mp3'
+
+main_gameplay_music = ROOT_DIR + '/assets/sounds/music/gameplay-music.mp3'
 
 
 def natural_sort(l):
-	convert = lambda text: int(text) if text.isdigit() else text.lower()
-	alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
-	return sorted(l, key=alphanum_key)
+    def convert(text): return int(text) if text.isdigit() else text.lower()
+
+    def alphanum_key(key): return [convert(c)
+                                   for c in re.split('([0-9]+)', key)]
+    return sorted(l, key=alphanum_key)
