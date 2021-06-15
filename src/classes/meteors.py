@@ -3,6 +3,7 @@
 	Info: for collide objects on the screen and obstacles to avoid
 """
 import glob
+
 import pygame
 
 from configs import meteor_assets_path, natural_sort, screen_size
@@ -12,6 +13,7 @@ class Meteor(pygame.sprite.Sprite):
 	def __init__(self, path, x_pos, y_pos, x_speed, y_speed, rotation_speed):
 		super().__init__()
 		self.angle = 0
+		self.slow_speed = False
 
 		self.meteor_collection_path = meteor_assets_path + path
 		self.images = natural_sort(glob.glob(self.meteor_collection_path + '*.gif'))
@@ -42,6 +44,11 @@ class Meteor(pygame.sprite.Sprite):
 		if self.rect.centery > screen_size[1] + 50 or self.rect.centerx < -50 or self.rect.centerx > screen_size[
 			0] + 50:
 			self.kill()
+
+	def slow_down_movement_speed(self):
+		self.slow_speed = True
+		self.x_speed = round((self.x_speed * 40) / 100)
+		self.y_speed = round((self.y_speed * 40) / 100)
 
 	# obstacles rotating animation
 	def animate_meteors(self):
