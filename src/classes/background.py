@@ -4,6 +4,7 @@
 """
 
 import pygame
+
 from configs import screen_size
 
 
