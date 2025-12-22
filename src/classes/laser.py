@@ -3,11 +3,14 @@
     Info: Player projectile that destroys meteors
 """
 import pygame
+from pygame import Rect, Surface
 
 from classes.asset_manager import assets
 
 
 class Laser(pygame.sprite.Sprite):
+    rect: Rect  # type: ignore[reportIncompatibleMethodOverride]
+    image: Surface  # type: ignore[reportIncompatibleMethodOverride]
     def __init__(self, pos, speed):
         super().__init__()
         # Use pre-loaded image from asset manager

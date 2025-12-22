@@ -3,12 +3,15 @@
     Info: Collectable items that restore health, ammo, or apply effects
 """
 import pygame
+from pygame import Rect, Surface
 
 from configs import screen_size
 from classes.asset_manager import assets
 
 
 class PowerUp(pygame.sprite.Sprite):
+    rect: Rect  # type: ignore[reportIncompatibleMethodOverride]
+    image: Surface  # type: ignore[reportIncompatibleMethodOverride]
     # Movement speed
     FALL_SPEED = 2
 

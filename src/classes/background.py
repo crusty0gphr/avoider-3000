@@ -3,12 +3,15 @@
     Info: Non-colliding decorative objects (stars, particles, etc.)
 """
 import pygame
+from pygame import Rect, Surface
 
 from configs import screen_size
 from classes.asset_manager import assets
 
 
 class Background(pygame.sprite.Sprite):
+    rect: Rect  # type: ignore[reportIncompatibleMethodOverride]
+    image: Surface  # type: ignore[reportIncompatibleMethodOverride]
     def __init__(self, x_pos, y_pos, x_speed, y_speed):
         super().__init__()
         # Use pre-loaded image from asset manager

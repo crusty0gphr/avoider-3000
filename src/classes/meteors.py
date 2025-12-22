@@ -3,12 +3,15 @@
     Info: Obstacle objects that the player must avoid or destroy
 """
 import pygame
+from pygame import Rect, Surface
 
 from configs import screen_size
 from classes.asset_manager import assets
 
 
 class Meteor(pygame.sprite.Sprite):
+    rect: Rect  # type: ignore[reportIncompatibleMethodOverride]
+    image: Surface  # type: ignore[reportIncompatibleMethodOverride]
     # Animation settings
     FRAME_DURATION = 50  # milliseconds per animation frame
 

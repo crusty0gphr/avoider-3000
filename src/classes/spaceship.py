@@ -3,12 +3,15 @@
     Info: Player character class with animation, health, ammo, and movement
 """
 import pygame
+from pygame import Rect, Surface
 
 from configs import screen_size
 from classes.asset_manager import assets
 
 
 class SpaceShip(pygame.sprite.Sprite):
+    rect: Rect  # type: ignore[reportIncompatibleMethodOverride]
+    image: Surface  # type: ignore[reportIncompatibleMethodOverride]
     # Animation settings
     FRAME_DURATION = 40  # milliseconds per animation frame
 
@@ -130,7 +133,10 @@ class SpaceShip(pygame.sprite.Sprite):
         self.ammo -= shot_amount
 
     def restore_health(self):
-        self.health = self.MAX_HEALTH
+        if self.health == self.MAX_HEALTH:
+            return
+
+        self.health += 1
 
     def restore_ammo(self):
         self.ammo = self.MAX_AMMO

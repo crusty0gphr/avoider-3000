@@ -28,7 +28,7 @@ class Score:
     def draw(self):
         """Render score on screen"""
         font = assets.get_font(26)
-        text_surface_center = (screen_size[0] / 2, 30)
+        text_surface_center = (screen_size[0] / 2, 55)
         text_surface = font.render(
             str(self.score), False, (255, 255, 255)
         )

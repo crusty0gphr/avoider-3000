@@ -84,7 +84,7 @@ class AssetManager:
 
     def get_image(self, key):
         """Get single image by key"""
-        return self._images.get(key)
+        return self._images[key]
 
     def get_sound(self, key):
         """Get sound object by key"""
@@ -92,7 +92,7 @@ class AssetManager:
 
     def get_font(self, size):
         """Get cached font by size"""
-        return self._fonts.get(size)
+        return self._fonts[size]
 
     def play_sound(self, key):
         """Play a cached sound effect"""

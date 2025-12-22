@@ -12,7 +12,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Initialize pygame to get display info
 pygame.init()
 display_info = pygame.display.Info()
-screen_size = (display_info.current_w, display_info.current_h)
+screen_size = (display_info.current_w - 15, display_info.current_h - 15)
 
 # Game metadata
 game_name = 'Avoider-3000'
