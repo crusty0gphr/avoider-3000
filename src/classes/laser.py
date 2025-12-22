@@ -1,21 +1,23 @@
 """
-	Class: Laser
-	Info: logic for the laser sprite
+    Class: Laser
+    Info: Player projectile that destroys meteors
 """
-
 import pygame
+
+from classes.asset_manager import assets
 
 
 class Laser(pygame.sprite.Sprite):
-    def __init__(self, path, pos, speed):
+    def __init__(self, pos, speed):
         super().__init__()
-        self.image = pygame.image.load(path)
+        # Use pre-loaded image from asset manager
+        self.image = assets.get_image('laser')
         self.speed = speed
         self.rect = self.image.get_rect(center=pos)
 
     def update(self):
         self.rect.centery -= self.speed
 
-        # remove offscreen meteors
+        # Remove offscreen lasers
         if self.rect.centery < -20:
             self.kill()

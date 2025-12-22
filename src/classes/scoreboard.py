@@ -1,10 +1,11 @@
 """
-	Class: Score
-	Info: update, reset, show users' score on the screen
+    Class: Score
+    Info: Manages and displays the player's score
 """
 import pygame
 
-from configs import ROOT_DIR, screen_size
+from configs import screen_size
+from classes.asset_manager import assets
 
 
 class Score:
@@ -13,19 +14,23 @@ class Score:
         self.screen = screen
 
     def reset(self):
+        """Reset score to zero"""
         self.score = 0
 
     def add_score(self, score_to_add):
+        """Add points to the score"""
         self.score += score_to_add
 
     def get_score(self):
+        """Get current score value"""
         return self.score
 
     def draw(self):
-        score_font = pygame.font.Font(
-            ROOT_DIR + '/assets/fonts/retro-gaming.ttf', 26)
+        """Render score on screen"""
+        font = assets.get_font(26)
         text_surface_center = (screen_size[0] / 2, 30)
-        text_surface = score_font.render(
-            str(self.score), False, (255, 255, 255))
+        text_surface = font.render(
+            str(self.score), False, (255, 255, 255)
+        )
         text_rect = text_surface.get_rect(center=text_surface_center)
         self.screen.blit(text_surface, text_rect)
