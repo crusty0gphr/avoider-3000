@@ -1,83 +1,148 @@
 """
-	Class: Score
-	Info: update, reset, show users' score on the screen
+    Class: SpaceShip
+    Info: Player character class with animation, health, ammo, and movement
 """
-import glob
-
 import pygame
+from pygame import Rect, Surface
 
-from configs import ROOT_DIR, spaceship_assets_path, natural_sort, screen_size
+from configs import screen_size
+from classes.asset_manager import assets
 
 
 class SpaceShip(pygame.sprite.Sprite):
+    rect: Rect  # type: ignore[reportIncompatibleMethodOverride]
+    image: Surface  # type: ignore[reportIncompatibleMethodOverride]
+    # Animation settings
+    FRAME_DURATION = 40  # milliseconds per animation frame
+
+    # Invincibility settings
+    INVINCIBILITY_DURATION = 1000  # milliseconds of immunity after taking damage
+    BLINK_INTERVAL = 100  # milliseconds between visibility toggles when invincible
+
+    # Player stats
+    MAX_HEALTH = 5
+    MAX_AMMO = 30
+
     def __init__(self, x_pos, y_pos, screen_obj):
         super().__init__()
         self.x = x_pos
         self.y = y_pos
-
         self.screen = screen_obj
-        self.images = natural_sort(glob.glob(spaceship_assets_path + '*.gif'))
 
+        # Use pre-loaded frames from asset manager
+        self.frames = assets.get_frames('spaceship')
         self.image_index = 0
-        self.image = pygame.image.load(self.images[self.image_index])
+        self.image = self.frames[self.image_index]
         self.clean_image = self.image.copy()
         self.center = (x_pos, y_pos)
-
         self.rect = self.image.get_rect(center=self.center)
-        self.shield_surface = pygame.image.load(
-            ROOT_DIR + '/assets/hot-dog-heart.png')
 
-        self.health = 5
-        self.ammo = 30
+        # Pre-loaded heart image for health display
+        self.shield_surface = assets.get_image('heart')
+
+        # Player stats
+        self.health = self.MAX_HEALTH
+        self.ammo = self.MAX_AMMO
+
+        # Delta-time animation tracking
+        self.last_update = pygame.time.get_ticks()
+        self.animation_timer = 0
+
+        # Invincibility state
+        self.invincible = False
+        self.invincible_timer = 0
+        self.blink_timer = 0
+        self.visible = True
 
     def update(self):
-        self.image_index += 1
+        now = pygame.time.get_ticks()
+        dt = now - self.last_update
+        self.last_update = now
+
         self.rect.center = pygame.mouse.get_pos()
 
-        self.animate_space_ship()
+        self.animate_space_ship(dt)
+        self.update_invincibility(dt)
         self.display_health()
         self.display_ammo()
         self.screen_constrain()
         self.rotate()
 
-    def animate_space_ship(self):
-        if self.image_index >= len(self.images):
-            self.image_index = 0
+    def animate_space_ship(self, dt):
+        """Delta-time based animation - consistent speed regardless of framerate"""
+        self.animation_timer += dt
+        if self.animation_timer >= self.FRAME_DURATION:
+            self.animation_timer = 0
+            self.image_index = (self.image_index + 1) % len(self.frames)
 
-        self.image = pygame.image.load(self.images[self.image_index])
+        self.image = self.frames[self.image_index]
         self.clean_image = self.image.copy()
 
+    def update_invincibility(self, dt):
+        """Handle invincibility timer and blinking effect"""
+        if self.invincible:
+            self.invincible_timer -= dt
+            self.blink_timer += dt
+
+            # Toggle visibility for blinking effect
+            if self.blink_timer >= self.BLINK_INTERVAL:
+                self.blink_timer = 0
+                self.visible = not self.visible
+
+            # End invincibility
+            if self.invincible_timer <= 0:
+                self.invincible = False
+                self.visible = True
+
+            # Apply visibility to image alpha
+            if not self.visible:
+                self.image = self.image.copy()
+                self.image.set_alpha(100)
+
     def display_health(self):
-        for index, shield in enumerate(range(self.health)):
-            index += 1
-            self.screen.blit(self.shield_surface,
-                             (index * 25, screen_size[1] - 40))
+        for index in range(self.health):
+            self.screen.blit(
+                self.shield_surface,
+                ((index + 1) * 25, screen_size[1] - 40)
+            )
 
     def display_ammo(self):
-        score_font = pygame.font.Font(
-            ROOT_DIR + '/assets/fonts/retro-gaming.ttf', 18)
+        font = assets.get_font(18)
         text_surface_center = (screen_size[0] - 70, screen_size[1] - 23)
-        text_surface = score_font.render(
-            'AMMO: ' + str(self.ammo), False, (255, 255, 255))
+        text_surface = font.render(
+            'AMMO: ' + str(self.ammo), False, (255, 255, 255)
+        )
         text_rect = text_surface.get_rect(center=text_surface_center)
-
         self.screen.blit(text_surface, text_rect)
 
-    # decrease players health when hits an obstacle
     def get_damage(self, damage_amount):
-        self.health -= damage_amount
+        """
+        Apply damage to player if not invincible.
+        Returns True if damage was applied, False if blocked by invincibility.
+        """
+        if not self.invincible:
+            self.health -= damage_amount
+            self.invincible = True
+            self.invincible_timer = self.INVINCIBILITY_DURATION
+            self.blink_timer = 0
+            return True
+        return False
 
-    # decrease ammo when player shoots
     def decrease_ammo(self, shot_amount):
+        """Decrease ammo when player shoots"""
         self.ammo -= shot_amount
 
     def restore_health(self):
-        self.health = 5
+        if self.health == self.MAX_HEALTH:
+            return
+
+        self.health += 1
 
     def restore_ammo(self):
-        self.ammo = 30
+        self.ammo = self.MAX_AMMO
 
     def screen_constrain(self):
+        """Keep player within screen boundaries"""
         if self.rect.left <= 0:
             self.rect.left = 0
 
@@ -90,33 +155,25 @@ class SpaceShip(pygame.sprite.Sprite):
         if self.rect.bottom >= screen_size[1] - 50:
             self.rect.bottom = screen_size[1] - 50
 
-    # spaceship animation when the player moves the mouse
     def rotate(self):
+        """Tilt spaceship based on mouse movement direction"""
         mouse_rel = pygame.mouse.get_rel()
 
-        # mouse movement - left
         if mouse_rel[0] < 0:
-            # tilt the spaceship 15 degrees left
+            # Tilt left when moving left
             self.image = self.rotate_from_center(self.clean_image, 15)
-            return
-
-        # mouse movement - right
-        if mouse_rel[0] > 0:
-            # tilt the spaceship 15 degrees right
+        elif mouse_rel[0] > 0:
+            # Tilt right when moving right
             self.image = self.rotate_from_center(self.clean_image, -15)
-            return
-
-        # mouse movement - stopped
-        if mouse_rel[0] == 0:
-            self.image = self.rotate_from_center(self.clean_image, 0)  # reset
-            return
+        else:
+            # Reset to upright when not moving
+            self.image = self.rotate_from_center(self.clean_image, 0)
 
     def rotate_from_center(self, image, angle):
+        """Rotate image around its center without changing dimensions"""
         orig_rect = image.get_rect()
-
         rot_image = pygame.transform.rotate(image, angle)
         rot_rect = orig_rect.copy()
         rot_rect.center = rot_image.get_rect().center
         rot_image = rot_image.subsurface(rot_rect).copy()
-
         return rot_image

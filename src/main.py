@@ -1,24 +1,37 @@
+"""
+Avoider-3000: A retro-style endless arcade space shooter
+Main game loop and orchestration
+"""
+
 import os
-import sys
 import random
+import sys
+
+from classes.asset_manager import assets
 from classes.background import Background
+from classes.game_state import GameState
 from classes.laser import Laser
 from classes.meteors import Meteor
 from classes.powerup import PowerUp
 from classes.scoreboard import Score
 from classes.spaceship import SpaceShip
-from configs import *
+from configs import METEOR_TYPES, game_name, screen_size
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+# Initialize pygame
+import pygame
 
 pygame.init()
 pygame.display.set_caption(game_name)
 screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 
-# sprites groups
+# Load all assets after display is initialized
+assets.load_all()
+
+# Sprite groups
 spaceship_group = pygame.sprite.GroupSingle()
-explosion_group = pygame.sprite.GroupSingle()
 laser_group = pygame.sprite.Group()
 meteor_group = pygame.sprite.Group()
 star_group = pygame.sprite.Group()
@@ -26,235 +39,248 @@ healing_group = pygame.sprite.Group()
 slow_down_group = pygame.sprite.Group()
 ammo_group = pygame.sprite.Group()
 
-# continuous timer
+# Meteor spawn timer
 METEOR_EVENT = pygame.USEREVENT
-pygame.time.set_timer(METEOR_EVENT, 250)
+pygame.time.set_timer(METEOR_EVENT, GameState.BASE_SPAWN_INTERVAL)
 
-# spaceship - player sprite
-SpaceShip = SpaceShip(400, 500, screen)
-spaceship_group.add(SpaceShip)
-# score obj
-Score = Score(screen)
+# Create player and score (using lowercase to avoid shadowing class names)
+player = SpaceShip(400, 500, screen)
+spaceship_group.add(player)
+score = Score(screen)
+
+# Game state manager
+state = GameState()
 
 
 def game_menu():
-    global screen
-    render_msg('-= AVOIDER =-', 100, (screen_size[0] / 2, 100))
-    render_msg('3000', 72, (screen_size[0] / 2, 200))
+    """Display the main menu screen"""
+    render_msg("-= AVOIDER =-", 100, (screen_size[0] / 2, 100))
+    render_msg("3000", 72, (screen_size[0] / 2, 200))
 
-    hot_dog = pygame.image.load(ROOT_DIR + '/assets/powerups/hot-dog.png')
+    hot_dog = assets.get_image("health_powerup")
     screen.blit(hot_dog, (screen_size[0] / 2 - 30, screen_size[1] / 2 - 60))
-    render_msg('Press SPACE to start!', 32,
-               (screen_size[0] / 2, screen_size[1] / 2 + 100))
-    render_msg('Press Q to quit!', 22,
-               (screen_size[0] / 2, screen_size[1] / 2 + 140))
 
-    render_msg('- Designed by: Sargis Mardirossian - Developed by: Harutyun Mardirossian -', 18,
-               (screen_size[0] / 2, screen_size[1] - 70))
-    render_msg('@Corrupted.bit', 20,
-               (screen_size[0] / 2, screen_size[1] - 40))
+    render_msg(
+        "Press SPACE to start!", 32, (screen_size[0] / 2, screen_size[1] / 2 + 100)
+    )
+    render_msg("Press Q to quit!", 22, (screen_size[0] / 2, screen_size[1] / 2 + 140))
 
-
-def init_power_ups(power_up_path, power_up_group):
-    random_x_pos_pu = random.randrange(50, screen_size[0] - 50)
-    random_y_pos_pu = random.randrange(-200, -50)
-
-    powerup = PowerUp(power_up_path, random_x_pos_pu, random_y_pos_pu)
-    power_up_group.add(powerup)
+    render_msg(
+        "- Designed by: Sargis Mardirossian - Developed by: Harutyun Mardirossian -",
+        18,
+        (screen_size[0] / 2, screen_size[1] - 70),
+    )
+    render_msg("@Corrupted.bit", 22, (screen_size[0] / 2, screen_size[1] - 40))
 
 
-def init_background():
-    # draw stars
+def spawn_powerup(powerup_type, group):
+    """Spawn a powerup at a random position"""
+    random_x = random.randrange(50, screen_size[0] - 50)
+    random_y = random.randrange(-200, -50)
+    powerup = PowerUp(powerup_type, random_x, random_y)
+    group.add(powerup)
+
+
+def draw_background():
+    """Update and draw background elements"""
     star_group.draw(screen)
     star_group.update()
 
 
-def init_game_pross(score_obj):
-    # hide the mouse cursor
+def run_gameplay(score_obj):
+    """Main gameplay loop logic - handle rendering, updates, and collisions"""
     pygame.mouse.set_visible(False)
 
-    global game_timer
-    global laser_ready
-    # draw meteor
+    # Draw and update all sprite groups
     meteor_group.draw(screen)
     meteor_group.update()
-    # draw laser
+
     laser_group.draw(screen)
     laser_group.update()
-    # draw healing hot dog
+
     healing_group.draw(screen)
     healing_group.update()
-    # draw draw ammo
+
     ammo_group.draw(screen)
     ammo_group.update()
-    # draw slow down timer
+
     slow_down_group.draw(screen)
     slow_down_group.update()
-    # draw player
+
     spaceship_group.draw(screen)
     spaceship_group.update()
-    # game score
-    Score.draw()
 
-    ''' --------- Check collisions with the SpaceShip --------- '''
-    if pygame.sprite.spritecollide(spaceship_group.sprite, meteor_group, True):
+    score_obj.draw()
+
+    # Check collisions with player
+    if pygame.sprite.spritecollide(player, meteor_group, True):
         damage = random.randrange(1, 3)
-        spaceship_group.sprite.get_damage(damage)
-        play_sound_effect(metal_impact_sound_effect)
+        if player.get_damage(damage):
+            assets.play_sound("metal_impact")
 
-    if pygame.sprite.spritecollide(spaceship_group.sprite, healing_group, True):
-        spaceship_group.sprite.restore_health()
-        play_sound_effect(healing_sound_effect)
+    if pygame.sprite.spritecollide(player, healing_group, True):
+        player.restore_health()
+        assets.play_sound("healing")
 
-    if pygame.sprite.spritecollide(spaceship_group.sprite, ammo_group, True):
-        spaceship_group.sprite.restore_ammo()
-        play_sound_effect(laser_reload_sound_effect)
+    if pygame.sprite.spritecollide(player, ammo_group, True):
+        player.restore_ammo()
+        assets.play_sound("laser_reload")
 
-    if pygame.sprite.spritecollide(spaceship_group.sprite, slow_down_group, True):
+    if pygame.sprite.spritecollide(player, slow_down_group, True):
+        meteor: Meteor
         for meteor in meteor_group.sprites():
             if not meteor.slow_speed:
                 meteor.slow_down_movement_speed()
 
+    # Check laser-meteor collisions
     for laser in laser_group:
         if pygame.sprite.spritecollide(laser, meteor_group, True):
             laser_group.remove(laser)
+            points = random.randrange(10, 55, 5)
+            score_obj.add_score(points)
+            assets.play_sound("explosion")
 
-            score = random.randrange(10, 50, 5)
-            score_obj.add_score(score)
-            play_sound_effect(explosion_sound_effect)
-
-    if pygame.time.get_ticks() - game_timer >= 125:
-        laser_ready = True
-
-
-def play_sound_effect(effect_path):
-    soundObj = pygame.mixer.Sound(effect_path)
-    soundObj.play()
+    # Update difficulty based on score
+    current_score = score_obj.get_score()
+    new_interval = state.update_difficulty(current_score)
+    if new_interval:
+        pygame.time.set_timer(METEOR_EVENT, new_interval)
 
 
-def init_game_over():
-    # hide the mouse cursor
+def game_over_screen():
+    """Display the game over screen"""
     pygame.mouse.set_visible(True)
-    score = Score.get_score()
+    final_score = score.get_score()
 
-    render_msg('GAME OVER', 58, (screen_size[0] / 2, screen_size[1] / 2 - 100))
-    render_msg(str(score), 48, (screen_size[0] / 2, screen_size[1] / 2 - 40))
-    render_msg('Press SPACE to try again!', 32,
-               (screen_size[0] / 2, screen_size[1] / 2 + 100))
-    render_msg('Press Q to quit the game', 22,
-               (screen_size[0] / 2, screen_size[1] / 2 + 160))
+    render_msg("GAME OVER", 58, (screen_size[0] / 2, screen_size[1] / 2 - 100))
+    render_msg(str(final_score), 48, (screen_size[0] / 2, screen_size[1] / 2 - 40))
+    render_msg(
+        "Press SPACE to try again!", 32, (screen_size[0] / 2, screen_size[1] / 2 + 100)
+    )
+    render_msg(
+        "Press Q to quit the game", 22, (screen_size[0] / 2, screen_size[1] / 2 + 160)
+    )
 
 
 def render_msg(msg, font_size, text_pos):
-    font = pygame.font.Font(
-        ROOT_DIR + '/assets/fonts/retro-gaming.ttf', font_size)
-
-    text_surface_center = text_pos
+    """Render text message on screen using cached font"""
+    font = assets.get_font(font_size)
     text_surface = font.render(msg, False, (255, 255, 255))
-    text_rect = text_surface.get_rect(center=text_surface_center)
+    text_rect = text_surface.get_rect(center=text_pos)
     screen.blit(text_surface, text_rect)
 
 
 def reset_game():
-    spaceship_group.sprite.health = 5
+    """Reset all game state for a new game"""
+    player.health = SpaceShip.MAX_HEALTH
+    player.restore_ammo()
+    player.restore_health()
+    player.invincible = False
+
     meteor_group.empty()
     star_group.empty()
-    Score.reset()
-    spaceship_group.sprite.restore_ammo()
-    spaceship_group.sprite.restore_health()
+    healing_group.empty()
+    ammo_group.empty()
+    slow_down_group.empty()
+    laser_group.empty()
+
+    score.reset()
+    state.reset()
+
+    # Reset spawn timer to base interval
+    pygame.time.set_timer(METEOR_EVENT, GameState.BASE_SPAWN_INTERVAL)
 
 
-def start_main_music():
-    ''' --- Start Main Music --- '''
-    play_sound_effect(main_gameplay_music)
+def start_background_music():
+    """Start the background music loop"""
+    # assets.play_sound("music")
 
 
-start_main_music()
+# Start the game
+start_background_music()
 
+# Main game loop
 while True:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+        # Quit game
+        if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
 
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            game_started = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
 
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not game_started:
-            game_started = True
-            reset_game()
+            if event.key == pygame.K_ESCAPE:
+                state.started = False
 
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and spaceship_group.sprite.health <= 0:
-            ''' ------------------ Reset the game and restore everything ------------------ '''
-            reset_game()
+            if event.key == pygame.K_SPACE:
+                if not state.started:
+                    reset_game()
+                    state.started = True
+                elif player.health <= 0:
+                    reset_game()
+                    state.started = True
 
-        if event.type == pygame.MOUSEBUTTONDOWN and spaceship_group.sprite.ammo > 0 and laser_ready:
-            ''' ------------------ Shooting from laser ------------------ '''
-            play_sound_effect(laser_sound_effect)
-            laser = Laser(laser_path, pygame.mouse.get_pos(), 20)
-            spaceship_group.sprite.decrease_ammo(1)
-            laser_group.add(laser)
-            game_timer = pygame.time.get_ticks()
-            laser_ready = False
+        # Shooting
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            current_time = pygame.time.get_ticks()
+            if player.ammo > 0 and state.can_fire(current_time):
+                assets.play_sound("laser_shot")
+                laser = Laser(pygame.mouse.get_pos(), 20)
+                player.decrease_ammo(1)
+                laser_group.add(laser)
+                state.fire(current_time)
 
+        # Spawn meteors and powerups
         if event.type == METEOR_EVENT:
-            if game_started:
-                ''' ------------------ Add random Meteors into the group ------------------ '''
-                meteor_path = random.choice(meteor_assets_tuple)
-
-                random_x_pos = random.randrange(5, screen_size[0] - 5)
-                random_y_pos = random.randrange(-200, -50)
-                random_x_speed = random.randrange(-2, 2)
-                random_y_speed = random.randrange(1, 5)
+            if state.started:
+                # Spawn meteor
+                meteor_type = random.choice(METEOR_TYPES)
+                random_x = random.randrange(5, screen_size[0] - 5)
+                random_y = random.randrange(-200, -50)
+                random_x_speed = random.randrange(-2, 3)
+                random_y_speed = random.randrange(1, 6)
                 rotation_speed = random.randrange(3, 8)
 
-                meteor = Meteor(meteor_path, random_x_pos, random_y_pos,
-                                random_x_speed, random_y_speed, rotation_speed)
+                meteor = Meteor(
+                    meteor_type,
+                    random_x,
+                    random_y,
+                    random_x_speed,
+                    random_y_speed,
+                    rotation_speed,
+                )
                 meteor_group.add(meteor)
 
-                ''' ------------------ Add random PowerUp into the group ------------------ '''
+                # Check for powerup spawns
+                powerups_to_spawn = state.tick_spawn_counters()
+                for powerup_type in powerups_to_spawn:
+                    if powerup_type == "slowdown":
+                        spawn_powerup("slowdown", slow_down_group)
+                    elif powerup_type == "health":
+                        spawn_powerup("health", healing_group)
+                    elif powerup_type == "ammo":
+                        spawn_powerup("ammo", ammo_group)
 
-                if slow_down_timer_count == 0:
-                    init_power_ups(slow_down_timer, slow_down_group)
-                elif slow_down_timer_count < 0:
-                    slow_down_timer_count = 120
-
-                if powerup_count == 0:
-                    init_power_ups(hot_god_powerup_path, healing_group)
-                elif powerup_count < 0:
-                    powerup_count = 90
-
-                if ammo_count == 0:
-                    init_power_ups(ammo_powerup_path, ammo_group)
-                elif ammo_count < 0:
-                    ammo_count = 35
-
-                slow_down_timer_count -= 1
-                powerup_count -= 1
-                ammo_count -= 1
-
-            ''' ------------------ Add random stars into the group ------------------ '''
-            random_x_pos = random.randrange(50, screen_size[0] - 50)
-            random_y_pos = random.randrange(-50, 0)
-            random_x_speed = 0
-            random_y_speed = 3
-
-            star = Background(star_asset_path, random_x_pos,
-                              random_y_pos, random_x_speed, random_y_speed)
+            # Always spawn background stars
+            random_x = random.randrange(50, screen_size[0] - 50)
+            random_y = random.randrange(-50, 0)
+            star = Background(random_x, random_y, 0, 3)
             star_group.add(star)
 
+    # Render frame
     screen.fill((20, 20, 0))
+    draw_background()
 
-    ''' --------- Draw assets into the screen --------- '''
-    init_background()
-
-    if game_started:
-        if spaceship_group.sprite.health > 0:
-            init_game_pross(Score)
+    if state.started:
+        if player.health > 0:
+            run_gameplay(score)
         else:
-            init_game_over()
+            game_over_screen()
     else:
         game_menu()
 
     pygame.display.update()
-    clock.tick(50)
+    clock.tick(60)  # Increased to 60 FPS for smoother gameplay
